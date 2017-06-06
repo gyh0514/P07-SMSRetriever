@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="android.myapplicationdev.com.p07_smsretriever">
 
+
     <uses-permission android:name="android.permission.READ_SMS"/>
 
     <application

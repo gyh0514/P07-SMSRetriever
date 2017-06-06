@@ -3,6 +3,7 @@ package android.myapplicationdev.com.p07_smsretriever;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -11,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.PermissionChecker;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +29,7 @@ public class FragmentSecond extends Fragment {
 
 
     TextView tvSms2;
-    Button btnRetrieve2;
+    Button btnRetrieve2, btnEmail;
     EditText etWord;
 
     public FragmentSecond() {
@@ -80,10 +82,20 @@ public class FragmentSecond extends Fragment {
                 //int num = Integer.parseInt(etNum.getText().toString());
 
                 String word = etWord.getText().toString();
-                String[] filterArgs = {"%"+ word +"%"};
+                String[] splited = word.split(" +");
+
+                for (int i=0; i<splited.length; i++){
+                    splited[i] = "%" + splited[i] + "%";
+                    if (i > 0){
+                        filter+="AND body LIKE ? ";
+                    }
+                    Log.d("HI", "onClick: " + splited[i]);
+                }
+
+
                 // Fetch SMS Message from Built-in Content Provider
 
-                Cursor cursor = cr.query(uri, reqCols, filter, filterArgs, null);
+                Cursor cursor = cr.query(uri, reqCols, filter, splited, null);
 
 
 
@@ -110,6 +122,30 @@ public class FragmentSecond extends Fragment {
 
             }
         });
+
+        btnEmail = (Button) view.findViewById(R.id.btnEmail);
+        btnEmail.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View arg0) {
+                // The action you want this intent to do;
+                // ACTION_SEND is used to indicate sending text
+                Intent email = new Intent(Intent.ACTION_SEND);
+                // Put essentials like email address, subject & body text
+                email.putExtra(Intent.EXTRA_EMAIL,
+                        new String[]{"jason_lim@rp.edu.sg"});
+                email.putExtra(Intent.EXTRA_SUBJECT,
+                        "SMS Content");
+                email.putExtra(Intent.EXTRA_TEXT,
+                        tvSms2.getText());
+                // This MIME type indicates email
+                email.setType("message/rfc822");
+                // createChooser shows user a list of app that can handle
+                // this MIME type, which is, email
+                startActivity(Intent.createChooser(email,
+                        "Choose an Email client :"));
+
+            }});
+
 
         return view;
     }
